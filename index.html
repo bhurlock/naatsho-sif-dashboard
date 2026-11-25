@@ -161,6 +161,41 @@ ul.plain li{padding:5px 0;border-top:1px solid var(--line)}
 .rs{padding:9px 0;border-top:1px solid var(--line)}
 .rs .rsh{color:var(--ink2);margin-bottom:3px}
 .rs .rsh b{color:var(--ink)}
+.conf{grid-column:1/-1;display:grid;gap:6px;margin:-4px 0 18px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px;font-size:12.5px}
+.cf-h{font-weight:700;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2)}
+.cf-row{display:grid;grid-template-columns:96px minmax(120px,280px) 1fr;gap:10px;align-items:center}
+.cf-bar{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--band)}
+.cf-bar i{display:block;height:100%}
+.cf-v{color:var(--ink2)}
+@media (max-width:620px){.cf-row{grid-template-columns:1fr}.cf-l{font-weight:600}}
+.gpgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 28px}
+@media (max-width:900px){.gpgrid{grid-template-columns:minmax(0,1fr)}}
+.gp h3 .cnt{display:inline-block;min-width:22px;padding:1px 7px;border-radius:10px;background:var(--warn-bg);color:var(--ink);font-size:11.5px;text-align:center;margin-left:4px}
+.gp-w{margin:2px 0 4px;font-size:12px}
+.gpgrid>.note{grid-column:1/-1}
+.sim{margin-top:10px;padding:8px 10px;border-left:3px solid var(--emp);background:var(--band);border-radius:0 6px 6px 0;font-size:12.5px;color:var(--ink)}
+.sim li .muted{margin-top:2px}
+#brief{display:none}
+@media print{
+  @page{size:letter;margin:0.5in}
+  body>*:not(#brief){display:none!important}
+  body{background:#fff!important}
+  #brief{display:block!important;color:#111;font:10.5px/1.4 Arial,Helvetica,sans-serif}
+  #brief .b-head{background:#1F3864;color:#fff;padding:12px 14px;border-bottom:3px solid #c9a227;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #brief .b-eyebrow{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#e8cf7a}
+  #brief h1{font-size:17px;margin:3px 0 2px;color:#fff}
+  #brief .b-sub{font-size:10px;color:#dfe6f2}
+  #brief .b-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:10px}
+  #brief h2{font-size:11.5px;margin:10px 0 4px;color:#1F3864;border-bottom:1px solid #ccd;padding-bottom:2px}
+  #brief table{border-collapse:collapse;width:100%;font-size:10px}
+  #brief th,#brief td{border:1px solid #ccd;padding:3px 5px;text-align:right}
+  #brief th:first-child,#brief td:first-child{text-align:left}
+  #brief th{background:#eef1f6;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #brief ul{margin:2px 0 0;padding-left:16px}
+  #brief li{margin:2px 0}
+  #brief p{margin:2px 0}
+  #brief .b-foot{margin-top:14px;padding-top:6px;border-top:1px solid #ccd;font-size:9px;color:#444}
+}
 .pgrid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
 .pgrid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
 @media (max-width:760px){.pgrid.two{grid-template-columns:minmax(0,1fr)}}
@@ -306,7 +341,7 @@ footer p{max-width:110ch;margin:0 0 8px}
       <a class="btn" href="https://form.jotform.com/263214356341047" target="_blank" rel="noopener">Report or correct an incident</a>
       <a class="btn" href="https://form.jotform.com/263235490269058" target="_blank" rel="noopener">Manage my emails</a>
     </div>
-    <div class="row2"><button class="btn" id="copySum" type="button">Copy summary</button>
+    <div class="row2"><button class="btn" id="printBrief" type="button">Print one-page brief</button><button class="btn" id="copySum" type="button">Copy summary</button>
     <button class="btn" id="dlCsv" type="button">Download incidents (CSV)</button></div>
     <div id="toast" role="status" aria-live="polite"></div>
   </div>
@@ -323,6 +358,7 @@ footer p{max-width:110ch;margin:0 0 8px}
     <label for="fType">Incident type<select id="fType"></select></label>
     <label for="fRoad">Road type<select id="fRoad"></select></label>
     <button class="btn" id="reset" type="button">Reset</button>
+    <button class="btn" id="share" type="button">Copy link to this view</button>
     <div class="togs" role="group" aria-label="Show or hide the analysis sections"><button class="tog" id="tOut" type="button" aria-pressed="true"><i></i>Outlook</button><button class="tog" id="tAct" type="button" aria-pressed="true"><i></i>Actions</button></div>
   </div>
   <div class="chips" id="chips"></div>
@@ -330,6 +366,7 @@ footer p{max-width:110ch;margin:0 0 8px}
 
 <main>
   <div class="tiles" id="tiles"></div>
+  <div class="conf" id="conf"></div>
 
   <section class="card c6"><h2>By state</h2>
     <p class="note">Click a state to filter the whole page to it. Click it again to clear. <span class="picked" id="pickS"></span></p>
@@ -413,6 +450,10 @@ footer p{max-width:110ch;margin:0 0 8px}
     <div class="xgrid" id="actX"></div>
     <p class="note fine" id="actF"></p></section>
 
+  <section class="card" id="gapCard"><h2>Help close the gaps</h2>
+    <p class="note" id="gapsN"></p>
+    <div class="gpgrid" id="gaps"></div></section>
+
   <section class="card mem"><h2 id="memT">In memoriam</h2>
     <p class="note" id="memN"></p>
     <div class="mem-grid" id="mem"></div></section>
@@ -489,7 +530,7 @@ async function load() {
   META.coverage.forEach(c => { COV[c[0]] = {code:c[0],name:c[1],region:c[2],status:c[3],depth:c[4],head:c[5],verified:c[6]}; NAME2CODE[c[1]] = c[0]; });
   CODES = Object.keys(COV).sort((a, b) => COV[a].name.localeCompare(COV[b].name));
   const m = /^(\d\d)-(\d\d)-(\d{4})/.exec(META.asOf); NOW = m ? `${m[3]}-${m[1]}-${m[2]}` : INC[INC.length - 1].date; NOWY = +NOW.slice(0, 4);
-  for (let y = 2015; y <= NOWY; y++) YEARS.push(y); F.y1 = NOWY;
+  for (let y = 2015; y <= NOWY; y++) YEARS.push(y); F.y1 = NOWY; readHash();
   $("asof").textContent = META.asOf + " Eastern";
   fillSelects(); applyShow(); render(); loadShapes();
   (__emb("d-adv") ? Promise.resolve(__emb("d-adv")) : fetch("advice.json", {cache: "no-store"}).then(r => r.json())).then(a => { a.idx = {}; a.items.forEach(it => { a.idx[it.f + "|" + it.v] = it; }); ADV = a; if (SHOW.act) drawActions(); }).catch(() => { ADVERR = true; if (SHOW.act) drawActions(); });
@@ -516,7 +557,7 @@ function syncSelects() { $("fSev").value = F.sev; $("fGrp").value = F.grp; $("fR
 function setF(k, v) { F[k] = v; if (k === "state" && v !== "All") F.region = "All"; if (k === "region" && v !== "All") F.state = "All"; page = 0; openRow = null; render(); }
 
 // ---------- render ----------
-function render() { syncSelects(); drawChips(); drawTiles(); drawGeo(); drawPoints(); drawTrend(); drawPace(); if (SHOW.out) drawOutlook(); drawMonth(); drawRegions(); drawRates(); drawWeek(); drawPatterns(); drawJobs(); drawCombo(); drawGroups(); drawAccount(); drawNear(); drawResp(); if (SHOW.act) drawActions(); drawMemorial(); drawStates(); drawQuality(); drawRows(); }
+function render() { writeHash(); syncSelects(); drawChips(); drawTiles(); drawConf(); drawGeo(); drawPoints(); drawTrend(); drawPace(); if (SHOW.out) drawOutlook(); drawMonth(); drawRegions(); drawRates(); drawWeek(); drawPatterns(); drawJobs(); drawCombo(); drawGroups(); drawAccount(); drawNear(); drawResp(); if (SHOW.act) drawActions(); drawGaps(); drawMemorial(); drawStates(); drawQuality(); drawRows(); }
 function applyShow() { $("outCard").hidden = !SHOW.out; $("actCard").hidden = !SHOW.act; $("tOut").setAttribute("aria-pressed", String(SHOW.out)); $("tAct").setAttribute("aria-pressed", String(SHOW.act)); }
 function setShow(k, v) { SHOW[k] = v; try { localStorage.setItem("naatsho-sif-show", JSON.stringify(SHOW)); } catch (e) {} applyShow(); if (v) { if (k === "out") drawOutlook(); else drawActions(); } }
 $("tOut").onclick = () => setShow("out", !SHOW.out); $("tAct").onclick = () => setShow("act", !SHOW.act);
@@ -865,7 +906,7 @@ function drawRows() {
   const grp = i => `<span class="grp-${i.ws.toLowerCase()}">${GRPN[i.ws]}</span>`;
   $("rows").innerHTML = `<thead><tr><th>Date</th><th>State</th><th>Severity</th><th class="num">Workers</th><th>Worker group</th><th>Agency</th><th>Incident type</th><th>What happened</th><th>Source</th></tr></thead><tbody>` +
     (L.length ? L.slice(page * PER, page * PER + PER).map(i => { const open = openRow === i.id;
-      return `<tr class="click" data-id="${esc(i.id)}"><td style="white-space:nowrap">${mdy(i.date)}</td><td>${i.st}</td><td><span class="sev" style="--c:${SEVC[i.sev]}">${SEVN[i.sev]}</span></td><td class="num">${i.n}</td><td>${grp(i)}</td><td>${esc(i.agency)}${i.contractor ? `<div class="muted">${esc(i.contractor)}</div>` : ""}</td><td>${esc(i.type)}</td><td><div class="how${open ? "" : " clamp"}">${esc(i.how)}</div>${open ? `<div class="muted" style="margin-top:6px">${esc(i.loc)}${i.task ? " &middot; Task: " + esc(i.task) : ""}<br>Road: ${esc(i.road)} &middot; Work zone: ${esc(i.wz)} &middot; Contributing factor: ${esc(i.cf)} &middot; Striking vehicle: ${esc(i.veh)} &middot; Case status: ${esc(i.case)} &middot; ${i.cls === "C" ? "Confirmed" : "Probable"} &middot; ${esc(i.id)}${i.response ? "<br>Agency response: " + esc(i.response) : ""}</div>` : ""}</td><td style="white-space:nowrap">${(i.src || []).map((u, k) => `<a href="${esc(u)}" target="_blank" rel="noopener">Source${i.src.length > 1 ? " " + (k + 1) : ""}</a>`).join("<br>")}</td></tr>`; }).join("") : `<tr><td colspan="9" class="empty">No incidents match these filters.</td></tr>`) + "</tbody>";
+      return `<tr class="click" data-id="${esc(i.id)}"><td style="white-space:nowrap">${mdy(i.date)}</td><td>${i.st}</td><td><span class="sev" style="--c:${SEVC[i.sev]}">${SEVN[i.sev]}</span></td><td class="num">${i.n}</td><td>${grp(i)}</td><td>${esc(i.agency)}${i.contractor ? `<div class="muted">${esc(i.contractor)}</div>` : ""}</td><td>${esc(i.type)}</td><td><div class="how${open ? "" : " clamp"}">${esc(i.how)}</div>${open ? `<div class="muted" style="margin-top:6px">${esc(i.loc)}${i.task ? " &middot; Task: " + esc(i.task) : ""}<br>Road: ${esc(i.road)} &middot; Work zone: ${esc(i.wz)} &middot; Contributing factor: ${esc(i.cf)} &middot; Striking vehicle: ${esc(i.veh)} &middot; Case status: ${esc(i.case)} &middot; ${i.cls === "C" ? "Confirmed" : "Probable"} &middot; ${esc(i.id)}${i.response ? "<br>Agency response: " + linkify(i.response) : ""}<br><a href="${VERIFY(i.id)}" target="_blank" rel="noopener">Verify or correct this record</a></div>${simHtml(i)}` : ""}</td><td style="white-space:nowrap">${(i.src || []).map((u, k) => `<a href="${esc(u)}" target="_blank" rel="noopener">Source${i.src.length > 1 ? " " + (k + 1) : ""}</a>`).join("<br>")}</td></tr>`; }).join("") : `<tr><td colspan="9" class="empty">No incidents match these filters.</td></tr>`) + "</tbody>";
   $("pager").innerHTML = L.length ? `<span>${fmt(page * PER + 1)} to ${fmt(Math.min(L.length, page * PER + PER))} of ${fmt(L.length)}</span><button class="btn" id="prev" type="button"${page ? "" : " disabled"}>Previous</button><button class="btn" id="next" type="button"${page < pages - 1 ? "" : " disabled"}>Next</button>` : "";
 }
 $("rows").addEventListener("click", e => { if (e.target.closest("a")) return; const r = e.target.closest("tr[data-id]"); if (r) { openRow = openRow === r.dataset.id ? null : r.dataset.id; drawRows(); } });
@@ -1058,6 +1099,88 @@ function drawResp() {
   $("resp").innerHTML = L.length ? L.map(i => `<div class="rs"><div class="rsh"><b>${esc(COV[i.st].name)}</b> · ${esc(i.agency)} · incident of ${mdy(i.date)} · ${esc(i.type)} · <span class="sev" style="--c:${SEVC[i.sev]}">${SEVN[i.sev]}</span></div><div>${i.response.split(/;\s+(?=\d\d-\d\d-\d{4} per )/).map(linkify).join("<br>")}</div></div>`).join("") : `<div class="muted">Nothing matches that search.</div>`;
 }
 $("respQ").addEventListener("input", e => { respQ = e.target.value; drawResp(); });
+
+// ---------- shareable links: the filters live in the address ----------
+const PUBLIC_URL = "https://bhurlock.github.io/naatsho-sif-dashboard/";
+const FDEF = () => ({sev:"SIF",grp:"All",region:"All",state:"All",y0:2015,y1:NOWY,type:"All",road:"All"});
+function viewHash() { const d = FDEF(), p = new URLSearchParams(); Object.keys(d).forEach(k => { if (String(F[k]) !== String(d[k])) p.set(k, F[k]); }); const s = p.toString(); return s ? "#" + s : ""; }
+function readHash() { let p; try { p = new URLSearchParams((location.hash || "").replace(/^#/, "")); } catch (e) { return false; } if (![...p.keys()].length) return false;
+  const d = FDEF(), vals = k => new Set(INC.map(i => i[k])), ok = {
+    sev: v => MEASURES.some(m => m[0] === v), grp: v => ["All","E","C","U"].includes(v), region: v => ["All","1","2","3","4","5"].includes(v), state: v => v === "All" || !!COV[v],
+    y0: v => YEARS.includes(+v), y1: v => YEARS.includes(+v), type: v => v === "All" || vals("type").has(v), road: v => v === "All" || vals("road").has(v)};
+  Object.keys(d).forEach(k => { const v = p.get(k); F[k] = v != null && ok[k](v) ? (k === "y0" || k === "y1" ? +v : v) : d[k]; });
+  if (F.y0 > F.y1) F.y0 = F.y1; if (F.state !== "All") F.region = "All"; return true; }
+function shareUrl() { const here = /github\.io$/.test(location.hostname) ? location.origin + location.pathname : PUBLIC_URL; return here + viewHash(); }
+function writeHash() { try { const h = viewHash(); if ((location.hash || "") !== h) history.replaceState(null, "", location.pathname + location.search + (h || "")); } catch (e) {} }
+window.addEventListener("hashchange", () => { if (readHash()) { page = 0; openRow = null; render(); } });
+$("share").onclick = () => copy(shareUrl(), "Link copied. It opens the dashboard with these filters set.");
+
+// ---------- how solid the numbers are ----------
+function drawConf() {
+  const L = INC.filter(i => match(i)), tot = W(L), noun = measureNoun();
+  if (!tot) { $("conf").innerHTML = ""; return; }
+  const conf = W(L, i => i.cls === "C"), byD = DEPTHS.map(d => W(L, i => COV[i.st].depth === d)), thin = byD[1], pc = v => Math.round(100 * v / tot) + "%";
+  const seg = (v, col, tip) => v ? `<i style="width:${100 * v / tot}%;background:${col}" data-tip="${esc(tip)}"></i>` : "";
+  $("conf").innerHTML = `<div class="cf-h">How solid these numbers are</div>
+    <div class="cf-row"><span class="cf-l">Source</span><div class="cf-bar">${seg(conf, "var(--emp)", "Employer confirmed by an official source\n" + fmt(conf) + " " + noun + " (" + pc(conf) + ")")}${seg(tot - conf, "var(--con)", "Employer stated by news reports only\n" + fmt(tot - conf) + " " + noun + " (" + pc(tot - conf) + ")")}</div><span class="cf-v">${pc(conf)} confirmed by an official source, ${pc(tot - conf)} news reports only</span></div>
+    <div class="cf-row"><span class="cf-l">Search depth</span><div class="cf-bar">${DEPTHS.map((d, k) => seg(byD[k], DEPTHC[k === 0 ? 1 : k], d + "\n" + fmt(byD[k]) + " " + noun + " (" + pc(byD[k]) + ")")).join("")}</div><span class="cf-v">${pc(byD[3])} from states searched twice, ${pc(byD[2])} one pass plus leads, ${pc(thin)} one pass only</span></div>`;
+}
+
+// ---------- help close the gaps ----------
+const GAPS = [
+  ["noname", "Fatalities from 2026 on with no name released", "A public source naming the worker lets the memorial list them.", i => i.sev === "F" && i.date >= "2026-01-01" && !i.name],
+  ["news", "Fatalities and significant injuries resting on news reports", "An official confirmation moves the record to Confirmed.", i => (i.sev === "F" || i.sev === "S") && i.cls !== "C"],
+  ["sev", "Injuries with no stated severity", "Whether the worker was admitted decides whether it counts as a SIF.", i => i.sev === "I"],
+  ["grp", "Worker group not known", "State employee or contractor decides which count it joins.", i => i.ws === "U"],
+  ["case", "Third-party cases still open after a year", "An outcome closes the record and shows what accountability followed.", i => (i.case === "Under investigation" || i.case === "Pending") && Date.parse(NOW) - Date.parse(i.date) > 365 * 864e5]];
+const gapOpen = new Set();
+const VERIFY = id => "https://form.jotform.com/263214356341047?incidentId=" + encodeURIComponent(id);
+function gapLists() { const L = INC.filter(i => match(i, {noSev: true})).sort((a, b) => b.date.localeCompare(a.date)); return GAPS.map(g => ({g, rows: L.filter(g[3])})); }
+function drawGaps() {
+  const G = gapLists(), tot = G.reduce((t, x) => t + x.rows.length, 0), nm = areaName();
+  $("gapsN").textContent = tot ? `${fmt(tot)} open items in ${nm}. If a record is from your agency, the Verify or correct link opens the form with the incident filled in. Responses from .gov and .us addresses update the log automatically at the next check, which runs four times a day. Do not send names of injured workers, employee ID numbers or medical details.` : `Nothing open in ${nm} under these filters.`;
+  $("gaps").innerHTML = G.filter(x => x.rows.length).map(({g, rows}) => { const all = gapOpen.has(g[0]), show = all ? rows : rows.slice(0, 5);
+    return `<div class="gp"><h3>${esc(g[1])} <span class="cnt">${fmt(rows.length)}</span></h3><p class="muted gp-w">${esc(g[2])}</p><ul class="plain">` +
+      show.map(i => `<li><a href="${VERIFY(i.id)}" target="_blank" rel="noopener">Verify or correct</a> &middot; ${mdy(i.date)} &middot; <b>${esc(COV[i.st].name)}</b> &middot; ${esc(i.agency)} &middot; ${esc(i.type)} &middot; <span class="sev" style="--c:${SEVC[i.sev]}">${SEVN[i.sev]}</span> <span class="muted">${esc(i.id)}</span></li>`).join("") + `</ul>` +
+      (rows.length > 5 ? `<button class="btn mini" type="button" data-gap="${g[0]}">${all ? "Show fewer" : "Show all " + fmt(rows.length)}</button>` : "") + `</div>`; }).join("") +
+    `<p class="note fine">Also waiting, across all states: ${fmt(META.reviewQueue)} incidents whose employer is not yet identified, held out of every count until it is. This card follows the filters except Measure.</p>`;
+}
+$("gaps").addEventListener("click", e => { const b = e.target.closest("[data-gap]"); if (!b) return; const k = b.dataset.gap; gapOpen.has(k) ? gapOpen.delete(k) : gapOpen.add(k); drawGaps(); });
+
+// ---------- incidents like this one ----------
+const SIMK = [["wz","work zone"],["pos","worker position"],["veh","striking vehicle"],["cf","contributing factor"],["prot","protection"]];
+function similar(i) { const use = SIMK.filter(([k]) => !MUTED.has(i[k]) && i[k] !== "Other");
+  return INC.filter(j => j.st !== i.st && j.type === i.type).map(j => ({j, m: use.filter(([k]) => j[k] === i[k])})).filter(x => x.m.length)
+    .sort((a, b) => b.m.length - a.m.length || (!!b.j.response - !!a.j.response) || b.j.date.localeCompare(a.j.date))
+    .filter((x, k, A) => A.findIndex(y => y.j.st === x.j.st && y.j.date === x.j.date) === k).slice(0, 3); }
+function simHtml(i) { const S = similar(i);
+  if (!S.length) return `<div class="sim"><b>Like this one in other states:</b> no close match in the log yet.</div>`;
+  return `<div class="sim"><b>Like this one in other states</b> <span class="muted">(same incident type, sharing at least one condition)</span><ul class="plain">` +
+    S.map(({j, m}) => `<li>${mdy(j.date)} &middot; <b>${esc(COV[j.st].name)}</b> &middot; ${esc(j.agency)} &middot; <span class="sev" style="--c:${SEVC[j.sev]}">${SEVN[j.sev]}</span> &middot; shares ${m.map(x => x[1] + " (" + esc(j[x[0]]) + ")").join(", ")}<div class="muted">${esc(j.how.length > 220 ? j.how.slice(0, 217) + "..." : j.how)}</div>${j.response ? `<div>What the agency did afterward: ${linkify(j.response)}</div>` : ""}</li>`).join("") + `</ul></div>`; }
+
+// ---------- one-page printable brief ----------
+function briefHtml() {
+  const B = INC.filter(i => match(i, {noSev: true})), V = INC.filter(i => match(i)), noun = measureNoun(), nm = areaName();
+  const t = s => three(B.filter(i => s.indexOf(i.sev) >= 0)), row = (lab, x) => `<tr><td>${lab}</td><td>${fmt(x.a)}</td><td>${fmt(x.e)}</td><td>${fmt(x.c)}</td><td>${fmt(x.u)}</td></tr>`;
+  const pats = [["Incident type","type"],["Work zone type","wz"],["Worker position","pos"],["Protection present","prot"],["Contributing factor","cf"],["Striking vehicle","veh"],["Light condition","light"]].map(([lab, k]) => { const o = topOf(V, k, k !== "type"); return o ? `<li><b>${lab}:</b> ${esc(o.v)}, ${Math.round(100 * o.sh)}% ${k === "type" ? "of " + esc(noun) : "where stated"}</li>` : ""; }).join("");
+  const ok = c => SEARCHED(c) && COV[c].head, area = CODES.filter(c => inGeo(c) && ok(c)), full = YEARS.filter(y => y < NOWY && y >= F.y0 && y <= F.y1);
+  let rate = "No rate for this area: it needs a searched jurisdiction with an agency headcount on file.";
+  if (area.length && full.length) { const S = new Set(area), h = area.reduce((s, c) => s + COV[c].head, 0), n = W(INC.filter(i => i.ws === "E" && match(i, {noGrp: true, noGeo: true}) && S.has(i.st) && +i.date.slice(0, 4) < NOWY));
+    rate = `${(1e4 * n / full.length / h).toFixed(1)} ${esc(noun)} per 10,000 state employees a year, ${full[0]}${full.length > 1 ? " to " + full[full.length - 1] : ""} (state employees only, ${area.length} ${area.length === 1 ? "jurisdiction" : "jurisdictions"}). A floor, not for ranking.`; }
+  const sc = ADV ? actScope() : null, acts = sc && sc.cards.length ? sc.cards.slice(0, 3).map(b => `<li><b>${esc(b.field)}: ${esc(b.v)}.</b> ${esc(b.item.a.slice(0, 2).join(" "))}</li>`).join("") : "<li>See the dashboard for recommended actions.</li>";
+  const G = gapLists(), st = CODES.filter(inGeo), depth = DEPTHS.map(d => st.filter(c => COV[c].depth === d).length);
+  const conf = W(V, i => i.cls === "C"), tv = Math.max(1, W(V));
+  return `<div class="b-head"><div class="b-eyebrow">NAATSHO &middot; National SIF Database</div><h1>State DOT Worker SIF Brief: ${esc(nm)}</h1><div class="b-sub">${F.y0} to ${F.y1}${F.grp !== "All" ? " &middot; " + GRPN[F.grp] + "s" : ""}${F.type !== "All" ? " &middot; " + esc(F.type) : ""}${F.road !== "All" ? " &middot; " + esc(F.road) : ""} &middot; Data as of ${esc(META.asOf)} Eastern</div></div>
+  <div class="b-cols"><div><h2>Workers in the log</h2><table><thead><tr><th></th><th>All</th><th>State employees</th><th>Contractors</th><th>Not known</th></tr></thead><tbody>${row("Fatal", t("F"))}${row("Significant", t("S"))}${row("<b>SIF</b>", t("FS"))}${row("Near miss", t("N"))}${row("Other injuries", t("MI"))}</tbody></table>
+  <h2>Rate</h2><p>${rate}</p>
+  <h2>How solid the numbers are</h2><p>${Math.round(100 * conf / tv)}% of ${esc(noun)} in view are confirmed by an official source; the rest rest on news reports. Search depth across ${st.length} jurisdiction${st.length === 1 ? "" : "s"}: ${DEPTHS.map((d, k) => depth[k] ? depth[k] + " " + d.replace(/^One pass plus/, "one pass plus").replace(/^One pass$/, "one pass").replace(/^Two passes$/, "two passes").replace(/^Not searched$/, "not searched") : "").filter(Boolean).join(", ")}.</p></div>
+  <div><h2>Leading patterns among ${esc(noun)}</h2><ul>${pats}</ul>
+  <h2>Recommended actions to consider</h2><ul>${acts}</ul>
+  <h2>Open items a state can close</h2><ul>${G.filter(x => x.rows.length).map(x => `<li>${esc(x.g[1])}: ${fmt(x.rows.length)}</li>`).join("") || "<li>None under these filters.</li>"}</ul></div></div>
+  <div class="b-foot">Publicly reported incidents only. Counts are a floor, are not complete, and coverage varies by state. Recommended actions are considerations based on public facts, not findings of cause or fault. Interactive view: ${esc(shareUrl())} &middot; Verify or correct any record: https://form.jotform.com/263214356341047</div>`;
+}
+$("printBrief").onclick = () => { let b = $("brief"); if (!b) { b = document.createElement("div"); b.id = "brief"; document.body.appendChild(b); } b.innerHTML = briefHtml();
+  try { window.print(); } catch (e) { toast("Printing is blocked here. Open the public dashboard and try again."); } };
 
 // ---------- export ----------
 function toast(t) { $("toast").textContent = t; clearTimeout(toast.t); toast.t = setTimeout(() => $("toast").textContent = "", 7000); }
