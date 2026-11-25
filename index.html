@@ -161,6 +161,7 @@ ul.plain li{padding:5px 0;border-top:1px solid var(--line)}
 .rs{padding:9px 0;border-top:1px solid var(--line)}
 .rs .rsh{color:var(--ink2);margin-bottom:3px}
 .rs .rsh b{color:var(--ink)}
+.stale{grid-column:1/-1;padding:10px 14px;border-radius:8px;background:var(--warn-bg);border:1px solid var(--sig);color:var(--ink);font-size:13px}
 .conf{grid-column:1/-1;display:grid;gap:6px;margin:-4px 0 18px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px;font-size:12.5px}
 .cf-h{font-weight:700;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2)}
 .cf-row{display:grid;grid-template-columns:96px minmax(120px,280px) 1fr;gap:10px;align-items:center}
@@ -365,6 +366,7 @@ footer p{max-width:110ch;margin:0 0 8px}
 </div>
 
 <main>
+  <div class="stale" id="stale" role="status" hidden></div>
   <div class="tiles" id="tiles"></div>
   <div class="conf" id="conf"></div>
 
@@ -532,6 +534,9 @@ async function load() {
   const m = /^(\d\d)-(\d\d)-(\d{4})/.exec(META.asOf); NOW = m ? `${m[3]}-${m[1]}-${m[2]}` : INC[INC.length - 1].date; NOWY = +NOW.slice(0, 4);
   for (let y = 2015; y <= NOWY; y++) YEARS.push(y); F.y1 = NOWY; readHash();
   $("asof").textContent = META.asOf + " Eastern";
+  { // Warn when the daily refresh has not run: counts on the page may be out of date.
+    const t = new Date(), today = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()), built = Date.parse(NOW + "T00:00:00Z"), age = Math.round((today - built) / 864e5);
+    if (age > 2) { $("stale").hidden = false; $("stale").innerHTML = `<b>This page has not been refreshed since ${mdy(NOW)}, ${age} days ago.</b> The daily update may have failed, so recent incidents may be missing. The email alerts are not affected.`; } }
   fillSelects(); applyShow(); render(); loadShapes();
   (__emb("d-adv") ? Promise.resolve(__emb("d-adv")) : fetch("advice.json", {cache: "no-store"}).then(r => r.json())).then(a => { a.idx = {}; a.items.forEach(it => { a.idx[it.f + "|" + it.v] = it; }); ADV = a; if (SHOW.act) drawActions(); }).catch(() => { ADVERR = true; if (SHOW.act) drawActions(); });
   if (window.claude && window.claude.use) window.claude.use("downloads").then(d => { downloads = d; }).catch(() => {});
