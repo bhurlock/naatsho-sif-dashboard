@@ -147,6 +147,39 @@ svg.chart .grid{stroke:var(--line);stroke-width:1}
 .pgrid{display:grid;gap:18px 26px;grid-template-columns:repeat(4,minmax(0,1fr))}
 @media (max-width:1180px){.pgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:620px){.pgrid{grid-template-columns:minmax(0,1fr)}}
+.pgrid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:900px){.pgrid.three{grid-template-columns:minmax(0,1fr)}}
+.sel{padding:3px 6px;border:1px solid var(--line);border-radius:6px;background:var(--ctl);font:600 12.5px var(--body);max-width:190px}
+.ptwrap{position:relative}
+.ptctl{position:absolute;right:6px;top:6px;display:flex;gap:6px;z-index:2}
+.ptctl .btn{background:var(--surface);min-width:30px}
+svg.pmap{display:block;width:100%;height:auto;max-height:600px;cursor:grab;touch-action:none;user-select:none;background:var(--band);border-radius:8px}
+svg.pmap:active{cursor:grabbing}
+svg.pmap .pst{fill:var(--surface);stroke:var(--ink2);stroke-opacity:.55;stroke-linejoin:round}
+svg.pmap .pst.on{fill:var(--warn-bg)}
+svg.pmap .pt{stroke:var(--surface);fill-opacity:.8;cursor:pointer}
+svg.pmap .pt:hover{fill-opacity:1;stroke:var(--ink)}
+svg.pmap .plab{font:600 11px var(--body);fill:var(--ink2);text-anchor:middle}
+table.hm{border-collapse:separate;border-spacing:2px;font-size:12px;width:100%}
+table.hm th{font-weight:600;text-align:left;padding:5px 6px;color:var(--ink);background:none;border:0}
+table.hm thead th{color:var(--ink2);font-size:11.5px;vertical-align:bottom}
+table.hm th.ch{text-align:center;min-width:54px;max-width:96px;white-space:normal;line-height:1.25}
+table.hm thead th:first-child{white-space:normal;max-width:150px;line-height:1.3}
+table.hm tbody th{white-space:nowrap}
+table.hm th.mute{color:var(--ink2);font-weight:500}
+table.hm td{text-align:center;padding:7px 4px;border-radius:4px;font-variant-numeric:tabular-nums;font-weight:600;border:0}
+table.hm td.z{color:var(--ink2);font-weight:400}
+table.hm .tot{color:var(--ink2);font-weight:600;text-align:center}
+.bf{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,36%) minmax(0,1fr) auto;gap:6px 8px;align-items:center;font-size:12.5px}
+.bf .bfh{font-weight:700;font-size:12.5px;line-height:1.3;padding-bottom:4px}
+.bf .bfh span{font-weight:500;color:var(--ink2);font-size:12px}
+.bf .l,.bf .r{display:flex;height:12px}
+.bf .l{justify-content:flex-end}
+.bf .l i{display:block;height:100%;border-radius:4px 0 0 4px;min-width:1px}
+.bf .r i{display:block;height:100%;border-radius:0 4px 4px 0;min-width:1px}
+.bf .lab{text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bf .lab.mute{color:var(--ink2)}
+.bf .val{font-variant-numeric:tabular-nums;font-weight:600;font-size:12px;color:var(--ink2)}
 .hb{display:grid;grid-template-columns:minmax(0,46%) minmax(0,1fr) auto;gap:5px 8px;align-items:center;font-size:12.5px}
 .hb .lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hb .lab.mute,.hb .val.mute{color:var(--ink2)}
@@ -285,6 +318,11 @@ footer p{max-width:110ch;margin:0 0 8px}
     <div class="seg" style="visibility:hidden" aria-hidden="true"><button type="button" tabindex="-1">&nbsp;</button></div>
     <div id="geoR"></div><div class="rchips" id="rchips"></div><div class="ramp" id="rampR"></div></section>
 
+  <section class="card"><h2>Where the incidents happened</h2>
+    <p class="note" id="ptN"></p>
+    <div class="legend" id="ptL"></div>
+    <div class="ptwrap"><div class="ptctl" role="group" aria-label="Map zoom"><button class="btn mini" id="zIn" type="button" aria-label="Zoom in">+</button><button class="btn mini" id="zOut" type="button" aria-label="Zoom out">&minus;</button><button class="btn mini" id="zRe" type="button">Reset</button></div><div id="geoP"></div></div></section>
+
   <section class="card c8"><h2 id="trendT">Workers by year</h2>
     <p class="note" id="trendN"></p>
     <div class="legend"><span><i class="sw" style="background:var(--emp)"></i>State employees</span><span><i class="sw" style="background:var(--con)"></i>Contractors</span><span><i class="sw" style="background:var(--unk)"></i>Status not known</span></div>
@@ -310,6 +348,19 @@ footer p{max-width:110ch;margin:0 0 8px}
     <p class="note">Workers in the current view, split by worker group. Rows in gray are values the sources did not state. Click an incident type or road type to filter.</p>
     <div class="legend"><span><i class="sw" style="background:var(--emp)"></i>State employees</span><span><i class="sw" style="background:var(--con)"></i>Contractors</span><span><i class="sw" style="background:var(--unk)"></i>Status not known</span></div>
     <div class="pgrid" id="patterns"></div></section>
+
+  <section class="card c6"><h2>Where patterns combine</h2>
+    <p class="note">Workers in the current view, counted by two fields at once. Darker cells hold more workers. Choose the fields: <select class="sel" id="hmR" aria-label="Rows"></select> by <select class="sel" id="hmC" aria-label="Columns"></select></p>
+    <div class="scroll" id="combo"></div>
+    <p class="note fine" id="comboN"></p></section>
+  <section class="card c6"><h2>State employees and contractors, side by side</h2>
+    <p class="note">The share of each group's workers in the current view, so the two can be compared despite their different sizes. This card ignores the Worker group filter. Compare by: <select class="sel" id="grK" aria-label="Field to compare"></select></p>
+    <div id="groups"></div>
+    <p class="note fine" id="groupsN"></p></section>
+
+  <section class="card"><h2>Driver accountability in struck-by-vehicle incidents</h2>
+    <p class="note" id="acctN"></p>
+    <div class="pgrid three" id="acct"></div></section>
 
   <section class="card ins" id="actCard"><div class="ins-h"><div><span class="tag" id="actTag">National view</span><h2 id="actT">Recommended actions</h2></div><button class="btn mini" type="button" data-hide="act">Hide</button></div>
     <p class="note" id="actN"></p>
@@ -375,7 +426,7 @@ const measureNoun = () => MEASURES.find(m => m[0] === F.sev)[3];
 function match(i, o) { o = o || {};
   const y = +i.date.slice(0, 4); if (y < F.y0 || y > F.y1) return false;
   if (!o.noGeo) { if (F.region !== "All" && COV[i.st].region !== +F.region) return false; if (F.state !== "All" && i.st !== F.state) return false; }
-  if (F.grp !== "All" && i.ws !== F.grp) return false;
+  if (!o.noGrp && F.grp !== "All" && i.ws !== F.grp) return false;
   if (!o.noSev && sevSet().indexOf(i.sev) < 0) return false;
   if (!o.noType && F.type !== "All" && i.type !== F.type) return false;
   if (!o.noRoad && F.road !== "All" && i.road !== F.road) return false;
@@ -420,7 +471,7 @@ function syncSelects() { $("fSev").value = F.sev; $("fGrp").value = F.grp; $("fR
 function setF(k, v) { F[k] = v; if (k === "state" && v !== "All") F.region = "All"; if (k === "region" && v !== "All") F.state = "All"; page = 0; openRow = null; render(); }
 
 // ---------- render ----------
-function render() { syncSelects(); drawChips(); drawTiles(); drawGeo(); drawTrend(); drawPace(); if (SHOW.out) drawOutlook(); drawMonth(); drawRegions(); drawPatterns(); if (SHOW.act) drawActions(); drawMemorial(); drawStates(); drawQuality(); drawRows(); }
+function render() { syncSelects(); drawChips(); drawTiles(); drawGeo(); drawPoints(); drawTrend(); drawPace(); if (SHOW.out) drawOutlook(); drawMonth(); drawRegions(); drawPatterns(); drawCombo(); drawGroups(); drawAccount(); if (SHOW.act) drawActions(); drawMemorial(); drawStates(); drawQuality(); drawRows(); }
 function applyShow() { $("outCard").hidden = !SHOW.out; $("actCard").hidden = !SHOW.act; $("tOut").setAttribute("aria-pressed", String(SHOW.out)); $("tAct").setAttribute("aria-pressed", String(SHOW.act)); }
 function setShow(k, v) { SHOW[k] = v; try { localStorage.setItem("naatsho-sif-show", JSON.stringify(SHOW)); } catch (e) {} applyShow(); if (v) { if (k === "out") drawOutlook(); else drawActions(); } }
 $("tOut").onclick = () => setShow("out", !SHOW.out); $("tAct").onclick = () => setShow("act", !SHOW.act);
@@ -474,7 +525,7 @@ async function loadShapes() {
     async () => { const d = decodeTopo((await window.__importJson(ATLAS)).default); return {s: d.shapes, m: d.mesh, v: V1}; },
     async () => { const d = decodeTopo(await (await fetch(ATLAS)).json()); return {s: d.shapes, m: d.mesh, v: V1}; },
     async () => { const u = (await import("https://cdn.jsdelivr.net/npm/@svg-maps/usa@2.0.0/+esm")).default, b = u.viewBox.split(/\s+/).map(Number); return {s: fromSvgMap(u), v: {x: b[0], y: b[1], w: b[2] + 62, h: b[3], bx: b[0] + b[2] + 8, by: b[1] + 200, px: b[0] + b[2] + 8, py: b[1] + b[3] - 60}}; } ];
-  for (const t of tries) { try { const r = await timeout(t()); if (Object.keys(r.s).length >= 50) { SHAPES = r.s; MESH = r.m || null; VIEW = r.v; drawGeo(); return; } } catch (e) {} } }
+  for (const t of tries) { try { const r = await timeout(t()); if (Object.keys(r.s).length >= 50) { SHAPES = r.s; MESH = r.m || null; VIEW = r.v; drawGeo(); drawPoints(); return; } } catch (e) {} } }
 
 function geoSvg(kind, fill, tipf, selKey, valLabel) {
   const R = kind === "R", key = c => R ? String(COV[c].region) : c, isSel = c => selKey != null && key(c) === String(selKey);
@@ -774,6 +825,97 @@ function drawRows() {
 }
 $("rows").addEventListener("click", e => { if (e.target.closest("a")) return; const r = e.target.closest("tr[data-id]"); if (r) { openRow = openRow === r.dataset.id ? null : r.dataset.id; drawRows(); } });
 $("pager").addEventListener("click", e => { if (e.target.id === "prev") { page--; openRow = null; drawRows(); } if (e.target.id === "next") { page++; openRow = null; drawRows(); } });
+
+// ---------- incident locations (point map) ----------
+function conic(p0, p1, rot, cLon, cLat, k, tx, ty) { const r = Math.PI / 180, s0 = Math.sin(p0 * r), s1 = Math.sin(p1 * r), n = (s0 + s1) / 2, C = 1 + s0 * (2 * n - s0), r0 = Math.sqrt(C) / n;
+  const raw = (lam, phi) => { const rr = Math.sqrt(C - 2 * n * Math.sin(phi)) / n; return [rr * Math.sin(n * lam), r0 - rr * Math.cos(n * lam)]; }, c = raw(cLon * r, cLat * r);
+  return (lon, lat) => { const p = raw((lon + rot) * r, lat * r); return [tx + k * (p[0] - c[0]), ty - k * (p[1] - c[1])]; }; }
+// Same projection the state outlines use (Albers USA, scale 1300, 975 by 610), so dots land on the shapes.
+const PK = 1300, PX = 487.5, PY = 305;
+const P48 = conic(29.5, 45.5, 96, -0.6, 38.7, PK, PX, PY), PAK = conic(55, 65, 154, -2, 58.5, PK * 0.35, PX - 0.307 * PK, PY + 0.201 * PK), PHI = conic(8, 18, 157, -3, 19.9, PK, PX - 0.205 * PK, PY + 0.212 * PK);
+const PRBOX = {x: 880, y: 548, w: 70, h: 40};
+function project(i) { if (i.lat == null || i.lon == null) return null;
+  if (i.st === "PR") return [PRBOX.x + PRBOX.w / 2 + (i.lon + 66.4) * 22, PRBOX.y + PRBOX.h / 2 - (i.lat - 18.2) * 22];
+  if (i.st === "AK" || (i.lat > 50 && i.lon < -128)) return PAK(i.lon, i.lat);
+  if (i.st === "HI" || (i.lat < 25 && i.lon < -150)) return PHI(i.lon, i.lat);
+  return P48(i.lon, i.lat); }
+const FULLVB = {x: 0, y: 0, w: 975, h: 610};
+let PVB = Object.assign({}, FULLVB), pvKey = "";
+function autoVB() { if (!SHAPES) return Object.assign({}, FULLVB);
+  const cs = F.state !== "All" ? [F.state] : F.region !== "All" ? CODES.filter(c => COV[c].region === +F.region && c !== "AK" && c !== "HI") : [];
+  const bs = cs.map(c => SHAPES[c]).filter(Boolean); if (!bs.length) return Object.assign({}, FULLVB);
+  let x0 = Math.min(...bs.map(s => s.cx - s.w / 2)), x1 = Math.max(...bs.map(s => s.cx + s.w / 2)), y0 = Math.min(...bs.map(s => s.cy - s.h / 2)), y1 = Math.max(...bs.map(s => s.cy + s.h / 2));
+  let w = (x1 - x0) * 1.25 + 20, h = (y1 - y0) * 1.25 + 20; if (w / h < 975 / 610) w = h * 975 / 610; else h = w * 610 / 975;
+  return {x: (x0 + x1) / 2 - w / 2, y: (y0 + y1) / 2 - h / 2, w, h}; }
+function drawPoints() {
+  const key = F.state + "|" + F.region + "|" + (SHAPES ? 1 : 0); if (key !== pvKey) { pvKey = key; PVB = autoVB(); }
+  const L = INC.filter(i => match(i)), P = L.map(i => ({i, p: project(i)})).filter(o => o.p), z = PVB.w / 975, ord = "NMISF";
+  P.sort((a, b) => ord.indexOf(a.i.sev) - ord.indexOf(b.i.sev));
+  let body = "";
+  if (SHAPES) { CODES.forEach(c => { const s = SHAPES[c]; if (s) body += `<path class="pst${F.state === c ? " on" : ""}" d="${s.d}" style="stroke-width:${(0.9 * z).toFixed(2)}"/>`; });
+    if (!SHAPES.PR) body += `<rect class="pst${F.state === "PR" ? " on" : ""}" x="${PRBOX.x}" y="${PRBOX.y}" width="${PRBOX.w}" height="${PRBOX.h}" rx="5" style="stroke-width:${(0.9 * z).toFixed(2)}"/><text class="plab" x="${PRBOX.x + PRBOX.w / 2}" y="${PRBOX.y - 6}">Puerto Rico</text>`; }
+  body += P.map(({i, p}) => `<circle class="pt" data-id="${esc(i.id)}" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${((4.2 + Math.min(4, i.n - 1) * 1.1) * z).toFixed(2)}" fill="${SEVC[i.sev]}" style="stroke-width:${(0.8 * z).toFixed(2)}" data-tip="${esc(mdy(i.date) + " · " + i.st + " · " + SEVN[i.sev] + "\n" + i.agency + " · " + GRPN[i.ws] + (i.n > 1 ? " · " + i.n + " workers" : "") + "\n" + i.type + "\n" + i.loc)}"/>`).join("");
+  $("geoP").innerHTML = `<svg class="pmap" viewBox="${PVB.x.toFixed(1)} ${PVB.y.toFixed(1)} ${PVB.w.toFixed(1)} ${PVB.h.toFixed(1)}" role="img" aria-label="Map of incident locations">${body}</svg>`;
+  const used = [...new Set(P.map(o => o.i.sev))].sort((a, b) => ord.indexOf(b) - ord.indexOf(a));
+  $("ptL").innerHTML = used.map(s => `<span><i class="sw" style="background:${SEVC[s]};border-radius:50%"></i>${SEVN[s]}</span>`).join("");
+  $("ptN").textContent = `${fmt(P.length)} of ${fmt(L.length)} incidents in this view have a location on file. Each dot is one incident; larger dots involve more workers. Places are approximate: the exit, milepost, intersection or town the source named. Hover a dot for the incident, click it to open it in the list below, and drag the map to move it.` + (SHAPES ? "" : " State outlines did not load, so only the dots are shown.");
+}
+function zoomP(f) { const cx = PVB.x + PVB.w / 2, cy = PVB.y + PVB.h / 2, w = Math.max(40, Math.min(975 * 1.2, PVB.w * f)), h = w * 610 / 975; PVB = {x: cx - w / 2, y: cy - h / 2, w, h}; drawPoints(); }
+$("zIn").onclick = () => zoomP(0.6); $("zOut").onclick = () => zoomP(1 / 0.6); $("zRe").onclick = () => { PVB = autoVB(); drawPoints(); };
+(function () { let d = null, moved = false; const g = $("geoP");
+  g.addEventListener("pointerdown", e => { const s = g.querySelector("svg"); if (!s) return; d = {x: e.clientX, y: e.clientY, vx: PVB.x, vy: PVB.y, k: PVB.w / s.getBoundingClientRect().width}; moved = false; });
+  window.addEventListener("pointermove", e => { if (!d) return; const dx = e.clientX - d.x, dy = e.clientY - d.y; if (Math.abs(dx) + Math.abs(dy) < 4 && !moved) return; moved = true; PVB.x = d.vx - dx * d.k; PVB.y = d.vy - dy * d.k; const s = g.querySelector("svg"); if (s) s.setAttribute("viewBox", `${PVB.x.toFixed(1)} ${PVB.y.toFixed(1)} ${PVB.w.toFixed(1)} ${PVB.h.toFixed(1)}`); });
+  window.addEventListener("pointerup", () => { d = null; });
+  g.addEventListener("click", e => { if (moved) { moved = false; return; } const c = e.target.closest ? e.target.closest(".pt") : null; if (!c) return; const L = viewRows(), k = L.findIndex(i => i.id === c.dataset.id); if (k < 0) return; page = Math.floor(k / PER); openRow = c.dataset.id; drawRows(); $("rows").scrollIntoView({behavior: "smooth", block: "start"}); }); })();
+
+// ---------- combinations, worker groups, driver accountability ----------
+const DIMS = [["Incident type","type"],["Worker position","pos"],["Work zone type","wz"],["Protection present","prot"],["Contributing factor","cf"],["Striking vehicle","veh"],["Light condition","light"],["Road type","road"]];
+const dimName = k => DIMS.find(d => d[1] === k)[0];
+const dimOpts = sel => DIMS.map(d => `<option value="${d[1]}"${d[1] === sel ? " selected" : ""}>${d[0]}</option>`).join("");
+const valOrder = (L, k) => { const g = {}; L.forEach(i => g[i[k]] = (g[i[k]] || 0) + i.n); return Object.keys(g).sort((a, b) => (MUTED.has(a) - MUTED.has(b)) || g[b] - g[a]); };
+const CMB = {r: "wz", c: "pos"}, GRP = {k: "type"};
+function drawCombo() {
+  $("hmR").innerHTML = dimOpts(CMB.r); $("hmC").innerHTML = dimOpts(CMB.c);
+  const L = INC.filter(i => match(i)), noun = measureNoun();
+  if (CMB.r === CMB.c) { $("combo").innerHTML = '<div class="muted">Choose two different fields.</div>'; $("comboN").textContent = ""; return; }
+  if (!L.length) { $("combo").innerHTML = '<div class="muted">No incidents match these filters.</div>'; $("comboN").textContent = ""; return; }
+  const rs = valOrder(L, CMB.r), cs = valOrder(L, CMB.c), g = {}; let max = 1, tot = 0, top = null;
+  L.forEach(i => { const k = i[CMB.r] + "\u0001" + i[CMB.c]; g[k] = (g[k] || 0) + i.n; tot += i.n; });
+  rs.forEach(r => cs.forEach(c => { const v = g[r + "\u0001" + c] || 0; if (!MUTED.has(r) && !MUTED.has(c)) { if (v > max) max = v; if (!top || v > top.v) top = {r, c, v}; } }));
+  const rt = r => cs.reduce((t, c) => t + (g[r + "\u0001" + c] || 0), 0), ct = c => rs.reduce((t, r) => t + (g[r + "\u0001" + c] || 0), 0);
+  $("combo").innerHTML = `<table class="hm"><thead><tr><th>${esc(dimName(CMB.r))} &darr;<br>${esc(dimName(CMB.c))} &rarr;</th>${cs.map(c => `<th class="ch${MUTED.has(c) ? " mute" : ""}">${esc(c)}</th>`).join("")}<th class="ch tot">All</th></tr></thead><tbody>` +
+    rs.map(r => `<tr><th class="${MUTED.has(r) ? "mute" : ""}">${esc(r)}</th>` + cs.map(c => { const v = g[r + "\u0001" + c] || 0, mute = MUTED.has(r) || MUTED.has(c), pct = mute ? 0 : Math.round(8 + 82 * v / max);
+      return `<td${v ? ` style="background:${mute ? "var(--band)" : `color-mix(in srgb,var(--m4) ${pct}%,var(--surface))`};color:${!mute && pct > 52 ? "var(--surface)" : mute ? "var(--ink2)" : "var(--ink)"}"` : ' class="z"'} data-tip="${esc(r + " and " + c + "\n" + fmt(v) + " " + noun + " (" + Math.round(100 * v / tot) + "% of this view)")}">${v ? fmt(v) : "&middot;"}</td>`; }).join("") + `<td class="tot">${fmt(rt(r))}</td></tr>`).join("") +
+    `<tr><th class="tot">All</th>${cs.map(c => `<td class="tot">${fmt(ct(c))}</td>`).join("")}<td class="tot">${fmt(tot)}</td></tr></tbody></table>`;
+  $("comboN").textContent = top && top.v ? `Most common stated combination: ${top.r} with ${top.c}, ${fmt(top.v)} ${noun} (${Math.round(100 * top.v / tot)}% of this view). Gray cells are values the sources did not state.` : "The sources state too little in these two fields to show a combination.";
+}
+$("hmR").onchange = e => { CMB.r = e.target.value; drawCombo(); }; $("hmC").onchange = e => { CMB.c = e.target.value; drawCombo(); };
+function drawGroups() {
+  $("grK").innerHTML = dimOpts(GRP.k);
+  const L = INC.filter(i => match(i, {noGrp: true})), E = L.filter(i => i.ws === "E"), C = L.filter(i => i.ws === "C"), ne = W(E), nc = W(C), noun = measureNoun();
+  if (!ne && !nc) { $("groups").innerHTML = '<div class="muted">No incidents match these filters.</div>'; $("groupsN").textContent = ""; return; }
+  const sum = (A, v) => W(A, i => i[GRP.k] === v), vals = valOrder(L.filter(i => i.ws !== "U"), GRP.k), pe = v => ne ? 100 * sum(E, v) / ne : 0, pc = v => nc ? 100 * sum(C, v) / nc : 0, mx = Math.max(1, ...vals.map(v => Math.max(pe(v), pc(v))));
+  let gap = null; vals.forEach(v => { if (MUTED.has(v)) return; const d = pe(v) - pc(v); if (!gap || Math.abs(d) > Math.abs(gap.d)) gap = {v, d}; });
+  $("groups").innerHTML = `<div class="bf"><div class="bfh" style="text-align:right;grid-column:1/3">State employees<br><span>${fmt(ne)} ${esc(noun)}</span></div><div></div><div class="bfh" style="grid-column:4/6">Contractors<br><span>${fmt(nc)} ${esc(noun)}</span></div>` +
+    vals.map(v => { const a = pe(v), b = pc(v), mute = MUTED.has(v), big = !mute && Math.abs(a - b) >= 10 && ne >= 10 && nc >= 10;
+      return `<div class="val">${Math.round(a)}%</div><div class="l" data-tip="${esc(v + "\nState employees: " + fmt(sum(E, v)) + " of " + fmt(ne) + " (" + Math.round(a) + "%)")}"><i style="width:${100 * a / mx}%;background:var(--emp)${mute ? ";opacity:.45" : ""}"></i></div><div class="lab${mute ? " mute" : ""}"${big ? ' style="font-weight:700"' : ""} title="${esc(v)}">${esc(v)}</div><div class="r" data-tip="${esc(v + "\nContractors: " + fmt(sum(C, v)) + " of " + fmt(nc) + " (" + Math.round(b) + "%)")}"><i style="width:${100 * b / mx}%;background:var(--con)${mute ? ";opacity:.45" : ""}"></i></div><div class="val">${Math.round(b)}%</div>`; }).join("") + `</div>`;
+  const thin = ne < 10 || nc < 10, u = W(L, i => i.ws === "U");
+  $("groupsN").textContent = (thin ? "One group has fewer than 10 workers in this view, so its shares are too thin to compare. " : gap && Math.abs(gap.d) >= 10 ? `Largest gap: ${gap.v}, ${Math.round(pe(gap.v))}% of state employees against ${Math.round(pc(gap.v))}% of contractors. ` : "No value differs by 10 points or more between the two groups. ") + (u ? `${fmt(u)} workers whose status is not known are left out. ` : "") + "A gap can reflect which incidents get reported, not only how the work differs.";
+}
+$("grK").onchange = e => { GRP.k = e.target.value; drawGroups(); };
+function drawAccount() {
+  const L = INC.filter(i => match(i, {noType: true}) && i.type === "Struck by vehicle"), n = L.length;
+  if (!n) { $("acct").innerHTML = '<div class="muted">No struck-by-vehicle incidents in this view.</div>'; $("acctN").textContent = ""; return; }
+  const cnt = k => { const g = {}; L.forEach(i => g[i[k]] = (g[i[k]] || 0) + 1); return g; }, ch = cnt("charges"), im = cnt("impair"), cs = cnt("case");
+  const YN = {Y: "Yes", N: "No", Unknown: "Not stated"}, col = {Y: "var(--fatal)", N: "var(--near)", Unknown: "var(--unk)"};
+  const block = (title, g, order, lab, colf) => { const mx = Math.max(1, ...order.map(v => g[v] || 0));
+    return `<div><h3>${title}</h3><div class="hb">` + order.filter(v => g[v]).map(v => { const mute = v === "Unknown";
+      return `<div class="row" data-tip="${esc(lab(v) + "\n" + fmt(g[v]) + " of " + fmt(n) + " incidents (" + Math.round(100 * g[v] / n) + "%)")}"><div class="lab${mute ? " mute" : ""}">${esc(lab(v))}</div><div><div class="bar" style="width:${100 * g[v] / mx}%;background:${colf(v)}${mute ? ";opacity:.5" : ""}"></div></div><div class="val${mute ? " mute" : ""}">${fmt(g[v])}</div></div>`; }).join("") + `</div></div>`; };
+  const csc = {Convicted: "var(--fatal)", Pending: "var(--sig)", "Under investigation": "var(--emp)", Dismissed: "var(--minor)", "No charges": "var(--near)", Unknown: "var(--unk)"};
+  $("acct").innerHTML = block("Charges filed against the driver", ch, ["Y","N","Unknown"], v => YN[v], v => col[v]) + block("Impairment alleged", im, ["Y","N","Unknown"], v => YN[v], v => col[v]) + block("Case status", cs, ["Convicted","Pending","Under investigation","Dismissed","No charges","Unknown"], v => v === "Unknown" ? "Not stated" : v, v => csc[v]);
+  const st = n - (ch.Unknown || 0), y = ch.Y || 0;
+  $("acctN").textContent = `${fmt(n)} struck-by-vehicle incidents in this view. Sources report charges in ${fmt(y)}` + (st ? `, out of ${fmt(st)} where a source says either way` : "") + `. Impairment was alleged in ${fmt(im.Y || 0)}. ${fmt(cs.Convicted || 0)} ended in a conviction on record and ${fmt((cs.Pending || 0) + (cs["Under investigation"] || 0))} are pending or under investigation. Counts are incidents, not workers. "Not stated" means no source addressed it, not that no charge was filed. This card always covers struck-by-vehicle incidents, whatever incident type is selected.`;
+}
 
 // ---------- export ----------
 function toast(t) { $("toast").textContent = t; clearTimeout(toast.t); toast.t = setTimeout(() => $("toast").textContent = "", 7000); }
