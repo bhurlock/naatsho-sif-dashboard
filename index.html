@@ -179,6 +179,14 @@ ul.plain li{padding:5px 0;border-top:1px solid var(--line)}
 @media (max-width:900px){.gpgrid{grid-template-columns:minmax(0,1fr)}}
 .gp h3 .cnt{display:inline-block;min-width:22px;padding:1px 7px;border-radius:10px;background:var(--warn-bg);color:var(--ink);font-size:11.5px;text-align:center;margin-left:4px}
 .gp-w{margin:2px 0 4px;font-size:12px}
+.gp li{margin-bottom:4px}
+.gp .gdet{background:none;border:0;padding:0;color:var(--link,#1F3864);text-decoration:underline;cursor:pointer;font:inherit}
+.gp .gbox{margin:6px 0 10px;padding:10px 12px;border-left:3px solid var(--warn,#c98a00);background:var(--band);border-radius:4px;font-size:13px;line-height:1.5}
+.gp .gbox .need{font-weight:700;margin-bottom:6px}
+.gp .gbox dl{display:grid;grid-template-columns:max-content 1fr;gap:2px 12px;margin:6px 0}
+.gp .gbox dt{color:var(--ink2)}
+.gp .gbox dd{margin:0}
+.gp .gbox .miss{color:var(--fatal);font-weight:600}
 .gpgrid>.note{grid-column:1/-1}
 .sim{margin-top:10px;padding:8px 10px;border-left:3px solid var(--emp);background:var(--band);border-radius:0 6px 6px 0;font-size:12.5px;color:var(--ink)}
 .sim li .muted{margin-top:2px}
@@ -1187,7 +1195,23 @@ const GAPS = [
   ["sev", "Injuries with no stated severity", "Whether the worker was admitted decides whether it counts as a SIF.", i => i.sev === "I"],
   ["grp", "Worker group not known", "State employee or contractor decides which count it joins.", i => i.ws === "U"],
   ["case", "Third-party cases still open after a year", "An outcome closes the record and shows what accountability followed.", i => (i.case === "Under investigation" || i.case === "Pending") && Date.parse(NOW) - Date.parse(i.date) > 365 * 864e5]];
-const gapOpen = new Set();
+const gapOpen = new Set(); let gapRow = null;
+// What each open-item group is asking for, and which field on the record shows the gap.
+const GAPFIELD = {noname: "name", news: "cls", sev: "sev", grp: "ws", case: "case"};
+function gapBox(g, i) {
+  const miss = (k, v) => GAPFIELD[g[0]] === k ? `<span class="miss">${esc(v)}</span>` : esc(v);
+  const E = v => esc(v);
+  const rows = [["Date", E(mdy(i.date))], ["State", E(COV[i.st].name)], ["Agency", E(i.agency + (i.contractor ? " (contractor: " + i.contractor + ")" : ""))],
+    ["Worker group", miss("ws", GRPN[i.ws])], ["Severity", miss("sev", SEVN[i.sev])], ["Workers", E(String(i.n))],
+    ...(i.sev === "F" && i.date >= "2026-01-01" ? [["Name", miss("name", i.name || "Not yet released")]] : []),
+    ["Source basis", miss("cls", i.cls === "C" ? "Confirmed by an official source" : "News reports only")],
+    ["Location", E(i.loc || "Not stated")], ["Incident type", E(i.type)], ["Task", E(i.task || "Not stated")], ["Road", E(i.road)], ["Work zone", E(i.wz)],
+    ["Contributing factor", E(i.cf)], ["Striking vehicle", E(i.veh)], ["Case status", miss("case", i.case)]];
+  return `<div class="gbox"><div class="need">What this record needs: ${E(g[2])}</div><div>${E(i.how || "")}</div>
+    <dl>${rows.map(r => `<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join("")}</dl>
+    ${(i.src || []).length ? `<div>Sources on file: ${i.src.map((u, k) => `<a href="${esc(u)}" target="_blank" rel="noopener">Source ${k + 1}</a>`).join(" &middot; ")}</div>` : ""}
+    <div style="margin-top:6px"><a href="${VERIFY(i.id)}" target="_blank" rel="noopener"><b>Verify or correct this record</b></a> <span class="muted">opens the form with ${esc(i.id)} filled in. Say what is wrong or missing and add a link or document if you have one. Do not send names of injured workers, employee ID numbers or medical details.</span></div></div>`;
+}
 // The form fills the Incident ID box from q2_textbox0 (its field name). incidentId is kept too, in case the field is renamed later.
 const VERIFY = id => { const v = encodeURIComponent(id); return "https://form.jotform.com/263214356341047?q2_textbox0=" + v + "&incidentId=" + v; };
 function gapLists() { const L = INC.filter(i => match(i, {noSev: true})).sort((a, b) => b.date.localeCompare(a.date)); return GAPS.map(g => ({g, rows: L.filter(g[3])})); }
@@ -1195,12 +1219,12 @@ function drawGaps() {
   const G = gapLists(), tot = G.reduce((t, x) => t + x.rows.length, 0), nm = areaName();
   $("gapsN").textContent = tot ? `${fmt(tot)} open items in ${nm}. If a record is from your agency, the Verify or correct link opens the form with the incident filled in. Responses from .gov and .us addresses update the log automatically at the next check, which runs four times a day. Do not send names of injured workers, employee ID numbers or medical details.` : `Nothing open in ${nm} under these filters.`;
   $("gaps").innerHTML = G.filter(x => x.rows.length).map(({g, rows}) => { const all = gapOpen.has(g[0]), show = all ? rows : rows.slice(0, 5);
-    return `<div class="gp"><h3>${esc(g[1])} <span class="cnt">${fmt(rows.length)}</span></h3><p class="muted gp-w">${esc(g[2])}</p><ul class="plain">` +
-      show.map(i => `<li><a href="${VERIFY(i.id)}" target="_blank" rel="noopener">Verify or correct</a> &middot; ${mdy(i.date)} &middot; <b>${esc(COV[i.st].name)}</b> &middot; ${esc(i.agency)} &middot; ${esc(i.type)} &middot; <span class="sev" style="--c:${SEVC[i.sev]}">${SEVN[i.sev]}</span> <span class="muted">${esc(i.id)}</span></li>`).join("") + `</ul>` +
+    return `<div class="gp" data-g="${g[0]}"><h3>${esc(g[1])} <span class="cnt">${fmt(rows.length)}</span></h3><p class="muted gp-w">${esc(g[2])}</p><ul class="plain">` +
+      show.map(i => `<li><button class="gdet" type="button" data-gid="${esc(i.id)}" aria-expanded="${gapRow === g[0] + "|" + i.id}">${gapRow === g[0] + "|" + i.id ? "Hide details" : "Details"}</button> &middot; <a href="${VERIFY(i.id)}" target="_blank" rel="noopener">Verify or correct</a> &middot; ${mdy(i.date)} &middot; <b>${esc(COV[i.st].name)}</b> &middot; ${esc(i.agency)} &middot; ${esc(i.type)} &middot; <span class="sev" style="--c:${SEVC[i.sev]}">${SEVN[i.sev]}</span> <span class="muted">${esc(i.id)}</span>${gapRow === g[0] + "|" + i.id ? gapBox(g, i) : ""}</li>`).join("") + `</ul>` +
       (rows.length > 5 ? `<button class="btn mini" type="button" data-gap="${g[0]}">${all ? "Show fewer" : "Show all " + fmt(rows.length)}</button>` : "") + `</div>`; }).join("") +
     `<p class="note fine">Also waiting, across all states: ${fmt(META.reviewQueue)} incidents whose employer is not yet identified, held out of every count until it is. Agencies with their own records can send them in bulk with the <a href="https://form.jotform.com/263280820813050" target="_blank" rel="noopener">Submit state data</a> form. This card follows the filters except Measure.</p>`;
 }
-$("gaps").addEventListener("click", e => { const b = e.target.closest("[data-gap]"); if (!b) return; const k = b.dataset.gap; gapOpen.has(k) ? gapOpen.delete(k) : gapOpen.add(k); drawGaps(); });
+$("gaps").addEventListener("click", e => { const d = e.target.closest("[data-gid]"); if (d) { const gp = d.closest(".gp"), gk = gp ? gp.dataset.g : "", key = gk + "|" + d.dataset.gid; gapRow = gapRow === key ? null : key; drawGaps(); return; } const b = e.target.closest("[data-gap]"); if (!b) return; const k = b.dataset.gap; gapOpen.has(k) ? gapOpen.delete(k) : gapOpen.add(k); drawGaps(); });
 
 // ---------- incidents like this one ----------
 const SIMK = [["wz","work zone"],["pos","worker position"],["veh","striking vehicle"],["cf","contributing factor"],["prot","protection"]];
