@@ -59,6 +59,11 @@ h1{font:700 32px/1.05 var(--display);margin:0;letter-spacing:.005em;text-wrap:ba
 .btn:hover{border-color:var(--emp)}
 .top .btn{background:transparent;color:var(--on-navy);border-color:rgba(255,255,255,.38)}
 .top .btn:hover{background:rgba(255,255,255,.1);border-color:var(--gold)}
+.top-act{flex-direction:column;align-items:flex-end}
+.top-act .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.top-links{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+@media (max-width:620px){.top-act{align-items:flex-start}.top-links,.top-act .row2{justify-content:flex-start}}
+a.btn{display:inline-block;text-decoration:none}
 .top .btn.primary{background:var(--gold);color:#14294a;border-color:var(--gold)}
 #toast{font-size:12.5px;color:var(--on-navy2);min-height:18px;flex-basis:100%;text-align:right}
 
@@ -296,8 +301,13 @@ footer p{max-width:110ch;margin:0 0 8px}
     <p class="lede">Significant injuries, fatalities and near misses among employees of state DOTs and state toll, turnpike, thruway and bridge authorities, and contractors on their projects, 2015 to present. <b>Publicly reported incidents only. Counts are a floor, and coverage varies by state.</b> Data as of <b id="asof">loading</b>.</p>
   </div>
   <div class="top-act">
-    <button class="btn" id="copySum" type="button">Copy summary</button>
-    <button class="btn primary" id="dlCsv" type="button">Download incidents (CSV)</button>
+    <div class="top-links" role="group" aria-label="Take part">
+      <a class="btn primary" href="https://form.jotform.com/263225994957070" target="_blank" rel="noopener">Get email alerts</a>
+      <a class="btn" href="https://form.jotform.com/263214356341047" target="_blank" rel="noopener">Report or correct an incident</a>
+      <a class="btn" href="https://form.jotform.com/263235490269058" target="_blank" rel="noopener">Manage my emails</a>
+    </div>
+    <div class="row2"><button class="btn" id="copySum" type="button">Copy summary</button>
+    <button class="btn" id="dlCsv" type="button">Download incidents (CSV)</button></div>
     <div id="toast" role="status" aria-live="polite"></div>
   </div>
 </div></header>
