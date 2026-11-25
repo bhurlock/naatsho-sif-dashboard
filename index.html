@@ -1134,7 +1134,8 @@ const GAPS = [
   ["grp", "Worker group not known", "State employee or contractor decides which count it joins.", i => i.ws === "U"],
   ["case", "Third-party cases still open after a year", "An outcome closes the record and shows what accountability followed.", i => (i.case === "Under investigation" || i.case === "Pending") && Date.parse(NOW) - Date.parse(i.date) > 365 * 864e5]];
 const gapOpen = new Set();
-const VERIFY = id => "https://form.jotform.com/263214356341047?incidentId=" + encodeURIComponent(id);
+// The form fills the Incident ID box from q2_textbox0 (its field name). incidentId is kept too, in case the field is renamed later.
+const VERIFY = id => { const v = encodeURIComponent(id); return "https://form.jotform.com/263214356341047?q2_textbox0=" + v + "&incidentId=" + v; };
 function gapLists() { const L = INC.filter(i => match(i, {noSev: true})).sort((a, b) => b.date.localeCompare(a.date)); return GAPS.map(g => ({g, rows: L.filter(g[3])})); }
 function drawGaps() {
   const G = gapLists(), tot = G.reduce((t, x) => t + x.rows.length, 0), nm = areaName();
