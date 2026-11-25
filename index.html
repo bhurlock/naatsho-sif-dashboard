@@ -180,6 +180,16 @@ ul.plain li{padding:5px 0;border-top:1px solid var(--line)}
 .gp h3 .cnt{display:inline-block;min-width:22px;padding:1px 7px;border-radius:10px;background:var(--warn-bg);color:var(--ink);font-size:11.5px;text-align:center;margin-left:4px}
 .gp-w{margin:2px 0 4px;font-size:12px}
 .gp li{margin-bottom:4px}
+.methods-card summary{cursor:pointer;list-style:none}
+#methods{scroll-margin-top:190px}
+.methods-card summary::-webkit-details-marker{display:none}
+.methods-card summary h2{display:inline}
+.methods-card summary h2::after{content:"  Show";font-size:12px;font-weight:400;color:var(--ink2)}
+.methods-card details[open] summary h2::after{content:"  Hide"}
+.methods{max-width:860px;font-size:14px;line-height:1.55}
+.methods h3{font-size:14px;margin:16px 0 4px}
+.methods ul{margin:4px 0 4px 18px;padding:0}
+.methods .cite{background:var(--band);padding:8px 10px;border-radius:4px;font-size:13px}
 .gp .gdet{background:none;border:0;padding:0;color:var(--link,#1F3864);text-decoration:underline;cursor:pointer;font:inherit}
 .gp .gbox{margin:6px 0 10px;padding:10px 12px;border-left:3px solid var(--warn,#c98a00);background:var(--band);border-radius:4px;font-size:13px;line-height:1.5}
 .gp .gbox .need{font-weight:700;margin-bottom:6px}
@@ -363,7 +373,7 @@ footer p{max-width:110ch;margin:0 0 8px}
       <a class="btn" href="https://form.jotform.com/263280820813050" target="_blank" rel="noopener">Submit state data</a>
     </div>
     <div class="row2"><button class="btn" id="printBrief" type="button">Print one-page brief</button><button class="btn" id="copySum" type="button">Copy summary</button>
-    <button class="btn" id="dlCsv" type="button">Download incidents (CSV)</button></div>
+    <button class="btn" id="dlCsv" type="button">Download incidents (CSV)</button><button class="btn" id="goMethods" type="button">Methods and how to cite</button></div>
     <div id="toast" role="status" aria-live="polite"></div>
   </div>
 </div></header>
@@ -497,6 +507,37 @@ footer p{max-width:110ch;margin:0 0 8px}
     <div class="scroll"><table id="rows"></table></div>
     <div class="pager" id="pager"></div></section>
 </main>
+<section class="card methods-card"><details id="methods"><summary><h2>Methods, definitions and how to cite</h2></summary>
+  <div class="methods">
+  <h3>What this is</h3>
+  <p>A national log of significant injuries and fatalities (SIFs) and near misses among workers of state departments of transportation and state toll, turnpike, thruway and bridge authorities, in all 50 states, the District of Columbia and Puerto Rico. Contractors working on those agencies' projects are included and shown as their own group. NAATSHO built it because no national database of these events exists. It is maintained with Claude, an AI system made by Anthropic, under the direction of NAATSHO's database owner, and is checked by state DOT safety professionals.</p>
+  <h3>Who is counted</h3>
+  <p>Included: on-duty events, medical events on the job, and travel or commuting in a state vehicle. Excluded: municipal and county workers, utility crews, tow operators, police and motorists. Suicides and other mental health events are never searched for and are not shown on this page.</p>
+  <h3>How incidents are found</h3>
+  <ul><li>Four times a day, a check reads news alerts and searches public news and official sources for new incidents from the past 48 hours.</li>
+  <li>A state-by-state search covers 2015 to the present. Each state's search depth is shown on the map and in the downloaded file: one pass, one pass plus research leads checked against their sources, or a second, year-by-year pass that also opens official records.</li>
+  <li>Leads from other research tools are never counted until a source has been opened and checked.</li>
+  <li>State safety offices confirm or correct records with the Verify or correct form, and can send their own records with the Submit state data form. Changes from a government email address are applied automatically.</li></ul>
+  <h3>Severity</h3>
+  <p>Interim definitions, to be aligned with NCHRP Project 20-24(157) when it is final. Fatal: a work-related death, including a later death from the injuries. Significant: in-patient hospital admission, amputation, loss of an eye, airlifted, or injuries reported as serious, critical or life-threatening. SIFs are Fatal plus Significant. Minor (treated and released, or reported minor), Near miss (no injury but clear potential for a serious one) and Injury, severity not stated (taken to a hospital with no further detail) are shown separately and never added to SIF figures. Being taken to a hospital is not treated as an admission. The definitions follow OSHA's severe-injury reporting rule (29 CFR 1904.39) for consistency, but a case counts even where OSHA reporting would not apply, such as a crash on a public highway.</p>
+  <h3>Confirmation</h3>
+  <p>Confirmed: an official source names the worker's employer, or the agency has verified the record. Probable: news reporting names the employer, with no official confirmation. Incidents where no source names the employer, or names the state agency whose project it was, are held in a review queue and not counted until one does.</p>
+  <h3>How counts work</h3>
+  <p>Every count is workers, not incidents. One crash that injures three workers counts three. Each figure is shown three ways: all workers, state employees, and contractors. Workers whose employer group is not yet known appear in the all-workers figure only. Rates per 10,000 use each state's state-government highway workforce from the Census Annual Survey of Public Employment and Payroll, cover state employees only, and are a floor, because counts are not complete. They are not for ranking states.</p>
+  <h3>Names</h3>
+  <p>Names appear only for workers who died in 2026 or later and only after the name has been publicly released. Names of injured workers are never recorded.</p>
+  <h3>Limits</h3>
+  <p>These counts reflect public reporting and are not complete. Coverage is uneven: states differ in how much is published and in how deeply they have been searched, and contractor incidents and injuries are reported less often than deaths of state employees. Time of day, day of week and season show when incidents were reported, not how much work was under way. Differences between states, regions, years or worker groups should not be read as trends where coverage could explain them.</p>
+  <h3>Refresh</h3>
+  <p>The page is rebuilt from the database each morning at about 5:15 AM Eastern. An incident found later in the day appears the next morning. A notice appears when the data is more than two days old.</p>
+  <h3>Downloading the data</h3>
+  <p>Download incidents (CSV) saves every incident in the current view, with the same fields this page shows plus the state's search depth and the data date. Set the filters first to narrow the file. Internal notes, charge details and recipient information are not included.</p>
+  <h3>How to cite</h3>
+  <p id="citeLine" class="cite"></p>
+  <p><button class="btn mini" id="copyCite" type="button">Copy citation</button></p>
+  <h3>Questions and corrections</h3>
+  <p>Use the Report or correct an incident form at the top of this page. Each incident also has its own Verify or correct link.</p>
+  </div></details></section>
 <footer>
   <p><b>Definitions.</b> Fatal: a work-related death, including a later death from the injuries. Significant: in-patient admission, amputation, loss of an eye, airlifted, or injuries reported as serious, critical or life-threatening. SIF is Fatal plus Significant. Minor injuries, near misses and injuries whose severity was not stated are shown separately and never added to SIF figures. Confirmed means an official source names the employer; Probable means news reporting does.</p>
   <p><b>Limits.</b> This log captures publicly reported incidents and is not complete. Most states have had one search pass, so a low count can mean little was found, not that little happened. Do not read differences between states, regions, years or worker groups as trends where uneven coverage could explain them. Names appear only for workers who died in 2026 or later and whose names were publicly released. Mental health events are not part of this log.</p>
@@ -559,7 +600,7 @@ async function load() {
   CODES = Object.keys(COV).sort((a, b) => COV[a].name.localeCompare(COV[b].name));
   const m = /^(\d\d)-(\d\d)-(\d{4})/.exec(META.asOf); NOW = m ? `${m[3]}-${m[1]}-${m[2]}` : INC[INC.length - 1].date; NOWY = +NOW.slice(0, 4);
   for (let y = 2015; y <= NOWY; y++) YEARS.push(y); F.y1 = NOWY; readHash();
-  $("asof").textContent = META.asOf + " Eastern";
+  $("asof").textContent = META.asOf + " Eastern"; try { $("citeLine").textContent = citation(); } catch (e) {}
   { // Warn when the daily refresh has not run: counts on the page may be out of date.
     const t = new Date(), today = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()), built = Date.parse(NOW + "T00:00:00Z"), age = Math.round((today - built) / 864e5);
     if (age > 2) { $("stale").hidden = false; $("stale").innerHTML = `<b>This page has not been refreshed since ${mdy(NOW)}, ${age} days ago.</b> The daily update may have failed, so recent incidents may be missing. The email alerts are not affected.`; } }
@@ -1264,16 +1305,21 @@ $("printBrief").onclick = () => { let b = $("brief"); if (!b) { b = document.cre
 // ---------- export ----------
 function toast(t) { $("toast").textContent = t; clearTimeout(toast.t); toast.t = setTimeout(() => $("toast").textContent = "", 7000); }
 function csv() { const q = v => { v = v == null ? "" : String(v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
-  const head = ["Incident ID","Date","State","NAATSHO region","Agency","Worker group","Contractor company","Classification","Severity","Workers affected","Incident type","Road type","Work zone type","Contributing factor","Striking vehicle type","Light condition","Worker position","Protection present","Case status","Location","Latitude","Longitude","What happened","Source"];
-  return [head].concat(viewRows().map(i => [i.id, mdy(i.date), i.st, REGN[COV[i.st].region], i.agency, GRPN[i.ws], i.contractor, i.cls === "C" ? "Confirmed" : "Probable", SEVN[i.sev], i.n, i.type, i.road, i.wz, i.cf, i.veh, i.light, i.pos, i.prot, i.case, i.loc, i.lat, i.lon, i.how, (i.src || [])[0] || ""])).map(r => r.map(q).join(",")).join("\r\n"); }
+  const hm = m => m == null ? "" : ((Math.floor(m / 60) % 12) || 12) + ":" + String(m % 60).padStart(2, "0") + (m < 720 ? " AM" : " PM");
+  const head = ["Incident ID","Date","Incident time (local)","State","NAATSHO region","Agency","Agency type","Worker group","Contractor company","Classification","Severity","Workers affected","Worker name (fatalities from 2026, publicly released)","Incident type","Job category","Task at time of incident","Road type","Work zone type","Contributing factor","Striking vehicle type","Light condition","Worker position","Protection present","Charges filed","Impairment alleged","Case status","Location","Latitude","Longitude","What happened","Agency response (public)","Source 1","Source 2","State search depth","Data as of"];
+  return [head].concat(viewRows().map(i => [i.id, mdy(i.date), hm(i.time), i.st, REGN[COV[i.st].region], i.agency, i.agt === "T" ? "Toll, turnpike, thruway, or bridge authority" : "State DOT", GRPN[i.ws], i.contractor, i.cls === "C" ? "Confirmed" : "Probable", SEVN[i.sev], i.n, i.name, i.type, i.job, i.task, i.road, i.wz, i.cf, i.veh, i.light, i.pos, i.prot, i.charges, i.impair, i.case, i.loc, i.lat, i.lon, i.how, i.response, (i.src || [])[0] || "", (i.src || [])[1] || "", COV[i.st].depth, META.asOf])).map(r => r.map(q).join(",")).join("\r\n"); }
+function citation() { return `NAATSHO. State DOT Worker Significant Injury and Fatality (SIF) Log. Data as of ${META.asOf} Eastern. ${PUBLIC_URL}. Accessed ${new Date().toLocaleDateString("en-US", {month: "2-digit", day: "2-digit", year: "numeric"}).replace(/\//g, "-")}. Publicly reported incidents; counts are not complete.`; }
 function summary() { const B = INC.filter(i => match(i, {noSev: true})), t = s => three(B.filter(i => s.indexOf(i.sev) >= 0)), f = t("F"), s = t("S"), sif = t("FS"), st = CODES.filter(inGeo);
   const line = (n, x) => `${n}: ${x.a} (${x.e} state employees, ${x.c} contractors${x.u ? ", " + x.u + " status not known" : ""})`;
   return [`NAATSHO State DOT Worker SIF Dashboard, data as of ${META.asOf} Eastern`, `View: ${areaName()}, ${F.y0} to ${F.y1}` + (F.grp !== "All" ? `, ${GRPN[F.grp]}s only` : "") + (F.type !== "All" ? `, ${F.type}` : "") + (F.road !== "All" ? `, ${F.road}` : ""), line("SIF workers (fatal plus significant)", sif), line("Fatalities", f), line("Significant injuries", s), `Near misses: ${W(B, i => i.sev === "N")}. Minor injuries: ${W(B, i => i.sev === "M")}. Injuries, severity not stated: ${W(B, i => i.sev === "I")}.`, `Search depth: ` + DEPTHS.map(d => `${st.filter(c => COV[c].depth === d).length} ${dl(d)}`).join(", ") + "."].concat(insightLines(), ["Publicly reported incidents only. Counts are not complete and coverage varies by state."]).join("\n"); }
 async function copy(text, ok) { try { await navigator.clipboard.writeText(text); toast(ok); } catch (e) { toast("Copy was blocked here. Open the dashboard in its own tab and try again."); } }
+$("copyCite").onclick = () => copy(citation(), "Citation copied.");
 $("copySum").onclick = () => copy(summary(), "Summary copied. Paste it into an email or a slide.");
 $("dlCsv").onclick = async () => { const data = "﻿" + csv(), name = `NAATSHO-SIF-incidents-${NOW}.csv`;
   if (downloads) { try { await downloads.save({filename: name, data}); toast("Download started."); return; } catch (e) { if (e && e.code === "declined") { toast("Download cancelled."); return; } } }
+  try { const url = URL.createObjectURL(new Blob([data], {type: "text/csv;charset=utf-8"})), a = document.createElement("a"); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000); toast(`Downloading ${fmt(viewRows().length)} incidents in the current view.`); return; } catch (e) {}
   copy(data, "Downloads are not available in this view, so the CSV was copied. Paste it into a spreadsheet."); };
+$("goMethods").onclick = () => { const m = $("methods"); m.open = true; m.scrollIntoView({behavior: "smooth", block: "start"}); };
 
 // ---------- tooltip ----------
 const tip = $("tip");
