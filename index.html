@@ -370,7 +370,6 @@ footer p{max-width:110ch;margin:0 0 8px}
     <div class="top-links" role="group" aria-label="Take part">
       <a class="btn alert" href="https://form.jotform.com/263307207151044" target="_blank" rel="noopener" title="For state safety offices: alert other states to a serious injury or fatality">&#9888; Send a SIF Alert</a>
       <a class="btn primary" href="https://form.jotform.com/263225994957070" target="_blank" rel="noopener">Get email alerts</a>
-      <a class="btn" href="https://form.jotform.com/263214356341047" target="_blank" rel="noopener">Report or correct an incident</a>
       <a class="btn" href="https://form.jotform.com/263235490269058" target="_blank" rel="noopener">Manage my emails</a>
       <a class="btn" href="https://form.jotform.com/263280820813050" target="_blank" rel="noopener">Submit state data</a>
     </div>
@@ -1265,7 +1264,7 @@ function drawGaps() {
     return `<div class="gp" data-g="${g[0]}"><h3>${esc(g[1])} <span class="cnt">${fmt(rows.length)}</span></h3><p class="muted gp-w">${esc(g[2])}</p><ul class="plain">` +
       show.map(i => `<li><button class="gdet" type="button" data-gid="${esc(i.id)}" aria-expanded="${gapRow === g[0] + "|" + i.id}">${gapRow === g[0] + "|" + i.id ? "Hide details" : "Details"}</button> &middot; <a href="${VERIFY(i.id)}" target="_blank" rel="noopener">Verify or correct</a> &middot; ${mdy(i.date)} &middot; <b>${esc(COV[i.st].name)}</b> &middot; ${esc(i.agency)} &middot; ${esc(i.type)} &middot; <span class="sev" style="--c:${SEVC[i.sev]}">${SEVN[i.sev]}</span> <span class="muted">${esc(i.id)}</span>${gapRow === g[0] + "|" + i.id ? gapBox(g, i) : ""}</li>`).join("") + `</ul>` +
       (rows.length > 5 ? `<button class="btn mini" type="button" data-gap="${g[0]}">${all ? "Show fewer" : "Show all " + fmt(rows.length)}</button>` : "") + `</div>`; }).join("") +
-    `<p class="note fine">Also waiting, across all states: ${fmt(META.reviewQueue)} incidents whose employer is not yet identified, held out of every count until it is. Agencies with their own records can send them in bulk with the <a href="https://form.jotform.com/263280820813050" target="_blank" rel="noopener">Submit state data</a> form. This card follows the filters except Measure.</p>`;
+    `<p class="note fine">Also waiting, across all states: ${fmt(META.reviewQueue)} incidents whose employer is not yet identified, held out of every count until it is. Agencies with their own records can send them in bulk with the <a href="https://form.jotform.com/263280820813050" target="_blank" rel="noopener">Submit state data</a> form. Know of a near miss or an incident this log is missing? <a href="https://form.jotform.com/263214356341047" target="_blank" rel="noopener">Tell us about it</a>. This card follows the filters except Measure.</p>`;
 }
 $("gaps").addEventListener("click", e => { const d = e.target.closest("[data-gid]"); if (d) { const gp = d.closest(".gp"), gk = gp ? gp.dataset.g : "", key = gk + "|" + d.dataset.gid; gapRow = gapRow === key ? null : key; drawGaps(); return; } const b = e.target.closest("[data-gap]"); if (!b) return; const k = b.dataset.gap; gapOpen.has(k) ? gapOpen.delete(k) : gapOpen.add(k); drawGaps(); });
 
